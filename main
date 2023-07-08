@@ -32,3 +32,69 @@ def round_to(num, digits=2):
         if scale < digits: scale = digits
         return round(num, scale)
     except: return num
+
+from config import *
+
+
+def round_to(num, digits=3):
+    if num == 0: return 0
+    try: 
+        scale = int(-math.floor(math.log10(abs(num - int(num))))) + digits - 1
+        if scale < digits: scale = digits
+        return round(num, scale)
+    except: return num
+
+def get_prices():
+
+    try:
+
+        logger.info('get prices')
+
+        prices = {
+            'ETH': 0, 
+            'BNB': 0, 
+            'AVAX': 0, 
+            'MATIC': 0, 
+            'AVAX': 0, 
+            'FTM': 0,
+            'BTC': 0,
+            'USDT': 0,
+            'USDC': 0,
+            'BUSD': 0,
+            'agEUR': 0
+        }
+
+        for symbol in prices:
+
+            url =f'https://min-api.cryptocompare.com/data/price?fsym={symbol}&tsyms=USDT'
+            response = requests.get(url)
+
+            try:
+                result  = [response.json()]
+                price   = result[0]['USDT']
+                prices[symbol] = float(price)
+            except Exception as error:
+                logger.error(f'{error}. set price : 0')
+                prices[symbol] = 0
+
+        logger.info(prices)
+        print()
+
+        return prices
+    
+    except Exception as error:
+        logger.error(f'{error}. Try again')
+        time.sleep(1)
+        return get_prices()
+    
+def get_value(token, amount):
+
+    if token == 'BTC.b': token = 'BTC'
+    if token == 'BSC-USD': token = 'USDT'
+    if token == 'USDC.e': token = 'USDC'
+
+    price = PRICES[token]
+    value = amount * price
+    return value
+
+datas = {}
